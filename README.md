@@ -1,2 +1,10 @@
-# rest-archetype
-arquetipo para el desarrollo de servicios rest con automatización de bases de datos
+# ArquetipoJavaModular
+
+ArquetipoJavaModular, permite un desarrollo de servicios rest
+
+- Jboss EAP
+- Java 8
+- RestEasy
+- Jackson XML/JSON
+- Automatización de conexiones a bases de datos
+
