@@ -1,5 +1,9 @@
 package cl.modular.apis.helper;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URL;
 import java.text.DecimalFormat;
@@ -14,6 +18,7 @@ import java.util.regex.Pattern;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXB;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -309,53 +314,6 @@ public class Utiles {
 	}
 
 	/**
-	 * Obtener la excepcion raiz, con esto no es necesario imprimir todo el objeto y
-	 * solo se obtendra la causa especifica
-	 * 
-	 * Se llama asi: System.out.println(getRootException(e).getLocalizedMessage());
-	 * 
-	 * @param exception
-	 * @return
-	 */
-	public static Throwable obtenerExcepcionRaiz(Throwable exception) {
-
-		Throwable rootException = exception;
-		rootException = rootException.getCause();
-		return rootException;
-
-	}
-
-	/**
-	 * Permite limpiarle el / al final a las url
-	 * 
-	 * @param input
-	 * @return
-	 */
-	public static String obtenerUrlLimpia(String input) {
-
-		String res = input;
-		log.info("URL analizada: " + input);
-
-		try {
-			String ultimoCaracter = input.substring(res.length() - 1, res.length());
-
-			if (ultimoCaracter.equalsIgnoreCase("/")) {
-				res = res.substring(0, res.length() - 1);
-				log.info("La url ha sido limpiada, resultado: " + res);
-			} else {
-				log.info("Url OK");
-			}
-
-		} catch (Exception e) {
-
-			log.error("ERROR > " + obtenerExcepcionRaiz(e));
-		}
-
-		return res;
-
-	}
-
-	/**
 	 * formateaNumerosenMiles
 	 * 
 	 * @param numeroFormatea
@@ -377,6 +335,21 @@ public class Utiles {
 		NumberFormat nf = NumberFormat.getNumberInstance(Locale.getDefault());
 		DecimalFormat myFormatter = (DecimalFormat) nf;
 		return "$" + myFormatter.format(numeroFormatea);
+	}
+
+	/**
+	 * Permite formatear los numeros en UF
+	 * 
+	 * @param input
+	 * @return
+	 */
+	public static String formateaUF(Double input) {
+		StringBuilder salida = new StringBuilder();
+		salida.append("UF ");
+		salida.append(formateaNumerosenMiles(input));
+
+		return salida.toString();
+
 	}
 
 	/**
@@ -430,6 +403,55 @@ public class Utiles {
 	}
 
 	/**
+	 * Obtener la excepcion raiz, con esto no es necesario imprimir todo el objeto y solo se obtendra la causa especifica
+	 * 
+	 * Se llama asi: System.out.println(getRootException(e).getLocalizedMessage());
+	 * 
+	 * @param exception
+	 * @return
+	 */
+	public static Throwable obtenerExcepcionRaiz(Throwable exception) {
+
+		Throwable rootException = exception;
+		while (rootException.getCause() != null) {
+			rootException = rootException.getCause();
+		}
+
+		return rootException;
+
+	}
+
+	/**
+	 * Permite limpiarle el / al final a las url
+	 * 
+	 * @param input
+	 * @return
+	 */
+	public static String obtenerUrlLimpia(String input) {
+
+		String res = input;
+		log.info("URL analizada: " + input);
+
+		try {
+			String ultimoCaracter = input.substring(res.length() - 1, res.length());
+
+			if (ultimoCaracter.equalsIgnoreCase("/")) {
+				res = res.substring(0, res.length() - 1);
+				log.info("La url ha sido limpiada, resultado: " + res);
+			} else {
+				log.info("Url OK");
+			}
+
+		} catch (Exception e) {
+
+			log.error("ERROR > " + obtenerExcepcionRaiz(e));
+		}
+
+		return res;
+
+	}
+
+	/**
 	 * Permite mediante un objeto cualquiera, devolverlo en cadena y formato XML
 	 * 
 	 * @param input
@@ -442,6 +464,59 @@ public class Utiles {
 		String xmlString = sw.toString();
 
 		return xmlString;
+
+	}
+
+	/**
+	 * getFileFromResources
+	 * 
+	 * @param fileName
+	 * @return
+	 */
+	public File getFileFromResources(String fileName) {
+
+		ClassLoader classLoader = getClass().getClassLoader();
+
+		URL resource = classLoader.getResource(fileName);
+		if (resource == null) {
+			throw new IllegalArgumentException("file is not found!");
+		} else {
+			return new File(resource.getFile());
+		}
+
+	}
+
+	/**
+	 * Encriptar en base 64
+	 * 
+	 * @param input
+	 * @return
+	 */
+	public static String encriptarBase64(File input) {
+
+		String encodedBase64 = null;
+		FileInputStream fileInputStreamReader = null;
+		try {
+
+			fileInputStreamReader = new FileInputStream(input);
+			byte[] bytes = new byte[(int) input.length()];
+			fileInputStreamReader.read(bytes);
+			encodedBase64 = new String(Base64.encodeBase64(bytes));
+
+		} catch (FileNotFoundException e) {
+			log.error("Error en metodo: [encriptarBase64]");
+		} catch (IOException e) {
+			log.error("Error en metodo: [encriptarBase64]");
+		} finally {
+			if (fileInputStreamReader != null)
+				try {
+					fileInputStreamReader.close();
+				} catch (IOException e) {
+					log.error("Error en metodo: [encriptarBase64]");
+				}
+		}
+
+		return encodedBase64;
 
 	}
 
