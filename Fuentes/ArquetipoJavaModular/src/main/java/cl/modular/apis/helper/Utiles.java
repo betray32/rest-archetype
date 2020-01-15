@@ -2,7 +2,6 @@ package cl.modular.apis.helper;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URL;
@@ -492,27 +491,31 @@ public class Utiles {
 	 * @param input
 	 * @return
 	 */
-	public static String encriptarBase64(File input) {
+	public static String encriptarBase64(String nombreArchivo) {
 
 		String encodedBase64 = null;
 		FileInputStream fileInputStreamReader = null;
+
 		try {
+
+			File input = new File(nombreArchivo);
+
+			log.info("Ruta Archivo: " + input.getAbsolutePath());
 
 			fileInputStreamReader = new FileInputStream(input);
 			byte[] bytes = new byte[(int) input.length()];
 			fileInputStreamReader.read(bytes);
 			encodedBase64 = new String(Base64.encodeBase64(bytes));
 
-		} catch (FileNotFoundException e) {
-			log.error("Error en metodo: [encriptarBase64]");
-		} catch (IOException e) {
-			log.error("Error en metodo: [encriptarBase64]");
+		} catch (Exception e) {
+			log.error("Error en metodo: [encriptarBase64]", e);
+
 		} finally {
 			if (fileInputStreamReader != null)
 				try {
 					fileInputStreamReader.close();
 				} catch (IOException e) {
-					log.error("Error en metodo: [encriptarBase64]");
+					log.error("Error en metodo: [encriptarBase64]", e);
 				}
 		}
 
