@@ -141,7 +141,7 @@
 		<sonar.exclusions>src/main/java/cl/modular/apis/helper/Validadores.java</sonar.exclusions>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<jboss.resteasy.version>3.1.4.Final</jboss.resteasy.version>
+		<jboss.resteasy.version>4.5.7.Final</jboss.resteasy.version>
 		<failOnMissingWebXml>false</failOnMissingWebXml>
 
 		<!-- Version de Jersey usada para Jackson Igualmente -->
